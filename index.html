@@ -20,18 +20,36 @@
         align-items: center;
         justify-content: space-between;
         height: 100vh;
-        padding: 20px;
+        padding: 15px 20px;
         text-align: center;
         overflow: hidden;
         user-select: none;
         transition: background-color 0.1s ease;
       }
 
+      /* Compact Top Start Button */
+      #start-btn {
+        padding: 6px 16px;
+        font-size: 0.85rem;
+        font-weight: bold;
+        color: #000;
+        background: #00ff00;
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0px 2px 8px rgba(0, 255, 0, 0.4);
+        cursor: pointer;
+        margin-top: 5px;
+      }
+
+      #start-btn:active {
+        transform: scale(0.95);
+      }
+
       h1 {
-        font-size: 1.8rem;
+        font-size: 1.6rem;
         color: #ffcc00;
         text-shadow: 2px 2px #ff0000;
-        margin-top: 10px;
+        margin-top: 5px;
       }
 
       /* Battery Bar Styling */
@@ -45,7 +63,7 @@
         overflow: hidden;
         position: relative;
         box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
-        margin-top: 10px;
+        margin-top: 5px;
       }
 
       #battery-level {
@@ -109,29 +127,15 @@
 
       #status {
         font-size: 1.1rem;
-        margin-top: 5px;
+        margin-bottom: 15px;
         min-height: 1.5em;
-      }
-
-      #start-btn {
-        padding: 15px 30px;
-        font-size: 1.2rem;
-        font-weight: bold;
-        color: #000;
-        background: #00ff00;
-        border: none;
-        border-radius: 50px;
-        box-shadow: 0px 5px 15px rgba(0, 255, 0, 0.4);
-        cursor: pointer;
-        margin-bottom: 20px;
-      }
-
-      #start-btn:active {
-        transform: scale(0.95);
       }
     </style>
   </head>
   <body>
+    <!-- Small Start Button at the Very Top -->
+    <button id="start-btn">TAP TO UNLEASH MASS POWER</button>
+
     <h1>⚡ KINETIC SLAP CHARGER ⚡</h1>
 
     <!-- Battery Bar Positioned Above Hero Image -->
@@ -148,8 +152,6 @@
     <div id="status">
       STATUS: <span style="color: #ff0000">READING DISCHARGED</span>
     </div>
-
-    <button id="start-btn">TAP TO UNLEASH MASS POWER</button>
 
     <script>
       let battery = 0;
