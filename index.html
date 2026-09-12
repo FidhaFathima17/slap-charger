@@ -1,1 +1,310 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kinetic Slap Charger</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Arial Black", Impact, sans-serif;
+      }
 
+      body {
+        background-color: #121212;
+        color: #ffffff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        height: 100vh;
+        padding: 20px;
+        text-align: center;
+        overflow: hidden;
+        user-select: none;
+        transition: background-color 0.1s ease;
+      }
+
+      h1 {
+        font-size: 1.8rem;
+        color: #ffcc00;
+        text-shadow: 2px 2px #ff0000;
+        margin-top: 10px;
+      }
+
+      /* Battery Bar Styling */
+      .battery-container {
+        width: 90%;
+        max-width: 320px;
+        height: 40px;
+        background-color: #333;
+        border: 3px solid #fff;
+        border-radius: 10px;
+        overflow: hidden;
+        position: relative;
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        margin-top: 10px;
+      }
+
+      #battery-level {
+        width: 0%;
+        height: 100%;
+        background-color: #ff0000;
+        transition:
+          width 0.3s ease,
+          background-color 0.4s ease;
+      }
+
+      #battery-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #ffffff;
+        text-shadow: 1px 1px 3px #000000;
+      }
+
+      /* Hero Image Container & Smooth Transitions */
+      .hero-container {
+        position: relative;
+        width: 280px;
+        height: 380px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      #hero-img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.8));
+        transition:
+          transform 0.12s cubic-bezier(0.175, 0.885, 0.32, 1.27),
+          opacity 0.25s ease-in-out;
+        opacity: 1;
+      }
+
+      /* Class applied during image swap for smooth cross-fade */
+      .img-fade-out {
+        opacity: 0.1 !important;
+        transform: scale(0.92) !important;
+      }
+
+      .slap-hit {
+        transform: scale(0.85) rotate(-3deg) !important;
+      }
+
+      .flash-red {
+        background-color: #660000 !important;
+      }
+
+      .flash-gold {
+        background-color: #665200 !important;
+      }
+
+      #status {
+        font-size: 1.1rem;
+        margin-top: 5px;
+        min-height: 1.5em;
+      }
+
+      #start-btn {
+        padding: 15px 30px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #000;
+        background: #00ff00;
+        border: none;
+        border-radius: 50px;
+        box-shadow: 0px 5px 15px rgba(0, 255, 0, 0.4);
+        cursor: pointer;
+        margin-bottom: 20px;
+      }
+
+      #start-btn:active {
+        transform: scale(0.95);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>⚡ KINETIC SLAP CHARGER ⚡</h1>
+
+    <!-- Battery Bar Positioned Above Hero Image -->
+    <div class="battery-container">
+      <div id="battery-level"></div>
+      <div id="battery-text">CHARGING: 0%</div>
+    </div>
+
+    <!-- Hero Image Wrapper -->
+    <div class="hero-container">
+      <img id="hero-img" src="hero_weak.png" alt="Hero State" />
+    </div>
+
+    <div id="status">
+      STATUS: <span style="color: #ff0000">READING DISCHARGED</span>
+    </div>
+
+    <button id="start-btn">TAP TO UNLEASH MASS POWER</button>
+
+    <script>
+      let battery = 0;
+      let lastSlapTime = 0;
+      let currentCycleShakes = 0;
+      let idleTimer = null;
+      let dischargeInterval = null;
+      let currentHeroSrc = "hero_weak.png";
+
+      // Loading high.mp4 and low.mp4
+      const shakeAudio = new Audio("high.mp4");
+      const idleAudio = new Audio("low.mp4");
+
+      shakeAudio.loop = true;
+      idleAudio.loop = true;
+
+      const heroImg = document.getElementById("hero-img");
+      const batteryLevel = document.getElementById("battery-level");
+      const batteryText = document.getElementById("battery-text");
+      const statusEl = document.getElementById("status");
+      const startBtn = document.getElementById("start-btn");
+
+      function setAudioState(isShaking) {
+        if (isShaking) {
+          if (!idleAudio.paused) {
+            idleAudio.pause();
+          }
+          if (shakeAudio.paused) {
+            shakeAudio.play().catch((e) => console.log("Audio play error:", e));
+          }
+        } else {
+          if (!shakeAudio.paused) {
+            shakeAudio.pause();
+          }
+          if (idleAudio.paused) {
+            idleAudio.play().catch((e) => console.log("Audio play error:", e));
+          }
+        }
+      }
+
+      function setHeroImage(newHeroSrc, statusHTML) {
+        statusEl.innerHTML = statusHTML;
+        if (currentHeroSrc !== newHeroSrc) {
+          currentHeroSrc = newHeroSrc;
+          heroImg.classList.add("img-fade-out");
+          setTimeout(() => {
+            heroImg.src = newHeroSrc;
+            heroImg.classList.remove("img-fade-out");
+          }, 120);
+        }
+      }
+
+      function registerSlap() {
+        const now = Date.now();
+        if (now - lastSlapTime < 120) return;
+        lastSlapTime = now;
+
+        setAudioState(true);
+
+        // Show MAX image instantly when shaking
+        setHeroImage(
+          "hero_max.png",
+          "STATUS: <span style='color:#00ff00;'>🔥 FULL ON MASS ACTION!</span>",
+        );
+
+        currentCycleShakes++;
+
+        // Every 6 continuous shakes = 1% Battery increase
+        if (currentCycleShakes >= 6) {
+          battery = Math.min(100, battery + 1);
+          currentCycleShakes = 0;
+        }
+
+        resetTimers();
+        triggerVisualFX();
+        updateUI();
+      }
+
+      function triggerVisualFX() {
+        heroImg.classList.add("slap-hit");
+        setTimeout(() => heroImg.classList.remove("slap-hit"), 90);
+
+        document.body.classList.add("flash-gold");
+        setTimeout(() => document.body.classList.remove("flash-gold"), 100);
+      }
+
+      function updateUI() {
+        batteryLevel.style.width = battery + "%";
+        batteryText.innerText = "CHARGING: " + battery + "%";
+
+        // Dynamic battery bar color based on percentage
+        if (battery > 50) {
+          batteryLevel.style.backgroundColor = "#00ff00";
+        } else if (battery > 20) {
+          batteryLevel.style.backgroundColor = "#ffcc00";
+        } else {
+          batteryLevel.style.backgroundColor = "#ff0000";
+        }
+      }
+
+      function resetTimers() {
+        clearTimeout(idleTimer);
+        clearInterval(dischargeInterval);
+
+        // Stop shaking timeout (1s pause -> return to WEAK image & IDLE audio)
+        idleTimer = setTimeout(() => {
+          setAudioState(false);
+          currentCycleShakes = 0;
+          setHeroImage(
+            "hero_weak.png",
+            "STATUS: <span style='color:#ff0000;'>💀 ENERGY DEPLETED! ADICHU KERI VAA!</span>",
+          );
+        }, 1000);
+
+        // Continuous Discharge Interval: Drops 1% every 3s while idle
+        dischargeInterval = setInterval(() => {
+          if (battery > 0) {
+            battery = Math.max(0, battery - 1);
+            updateUI();
+          }
+        }, 3000);
+      }
+
+      startBtn.addEventListener("click", () => {
+        setAudioState(false);
+        startBtn.style.display = "none";
+
+        if (
+          typeof DeviceMotionEvent !== "undefined" &&
+          typeof DeviceMotionEvent.requestPermission === "function"
+        ) {
+          DeviceMotionEvent.requestPermission().then((response) => {
+            if (response === "granted") {
+              window.addEventListener("devicemotion", handleMotion);
+            } else {
+              alert("Permission to access motion sensors was denied.");
+            }
+          });
+        } else {
+          window.addEventListener("devicemotion", handleMotion);
+        }
+      });
+
+      function handleMotion(event) {
+        const acc = event.accelerationIncludingGravity;
+        if (!acc) return;
+
+        const totalAccel = Math.sqrt(
+          acc.x * acc.x + acc.y * acc.y + acc.z * acc.z,
+        );
+
+        if (totalAccel > 22) {
+          registerSlap();
+        }
+      }
+    </script>
+  </body>
+</html>
