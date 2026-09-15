@@ -4,7 +4,7 @@
 
 ## Basic Details
 
-### Team Name: Zero&one
+### Team Name: Zero & one
 
 ### Team Members
 
@@ -45,7 +45,7 @@ For Software:
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/slap-charger.git
+git clone https://github.com/fidhafathima17/slap-charger.git
 
 # Navigate to project folder
 cd slap-charger
@@ -64,35 +64,48 @@ For Software:
 
 # Screenshots
 
-![Screenshot1](Add screenshot 1 here with proper name)
-_Displays the depleted hero state (`hero_weak.png`) and low-frequency idle audio mode when no phone motion is detected._
+![Screenshot 1](screenshots/Screenshot_20260912-160359.png)
 
-![Screenshot2](Add screenshot 2 here with proper name)
-_Displays the powered-up hero state (`hero_max.png`), gold background flashes, and high-energy audio loop during active continuous shaking._
+![Screenshot 2](screenshots/Screenshot_20260912-160422.png)
 
-![Screenshot3](Add screenshot 3 here with proper name)
-_Top-positioned dynamic battery bar showing progress from 0% to 100% based on continuous shake cycles._
+![Screenshot 3](screenshots/Screenshot_20260912-160428.png)
+
+![Screenshot 4](screenshots/Screenshot_20260912-230827.png)
 
 # Diagrams
 
-![Workflow](Add your workflow/architecture diagram here)
+```mermaid
+flowchart TD
+	A[Open Slap-Charger] --> B[Request motion sensor access]
+	B --> C[Read DeviceMotionEvent]
+	C --> D{Acceleration magnitude > 22?}
+	D -- No --> E[Decay battery and keep idle audio]
+	E --> C
+	D -- Yes --> F[Increment slap counter]
+	F --> G{Six continuous slaps?}
+	G -- No --> C
+	G -- Yes --> H[Increase virtual battery by 1%]
+	H --> I[Update hero, battery bar, and high-energy audio]
+	I --> J{No motion timeout?}
+	J -- No --> C
+	J -- Yes --> E
+```
 _Workflow showing device accelerometer motion detection (`√(x²+y²+z²) > 22`) triggering slap counters, dual audio toggles, and state decay timers._
 
 ### Project Demo
 
-# Video
+<!-- # Video -->
 
-[Add your demo video link here]
-_Demonstrates live phone motion tracking on a mobile browser, dynamic battery charging, state transitions, and automatic idle energy discharge._
+<!-- [Add your demo video link here] -->
 
 # Additional Demos
 
-[Add any extra demo materials/links]
+Live demo: https://fidhafathima17.github.io/slap-charger/
 
 ## Team Contributions
 
 - Fidha Fathima: Developed motion sensor detection logic (`DeviceMotionEvent`), battery charging/discharge algorithms, continuous audio loop switching, and UI layout structure.
-- Adhithyan K S: Designed visual assets (`hero_weak.png`, `hero_max.png`), CSS transition effects, sound file integration (`high.mp4`, `low.mp4`), and Netlify deployment setup.
+- Adhithyan K S: Designed visual assets (`hero_weak.png`, `hero_max.png`), CSS transition effects, sound file integration (`high.mp4`, `low.mp4`), documentation and GitHub pages  deployment setup.
 
 Made with ❤️ at TinkerHub Useless Projects
 
